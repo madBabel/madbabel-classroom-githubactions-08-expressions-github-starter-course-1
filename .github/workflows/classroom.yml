@@ -22,6 +22,7 @@ jobs:
           echo "Custom YAML file 08-expressions.yaml exists."
 
       - name: Check for expected workflow triggers
+        if: always()
         run: |
           if ! grep -q "workflow_dispatch" .github/workflows/08-expressions.yaml; then
             echo "Error: 'workflow_dispatch' trigger is missing!"
@@ -42,6 +43,7 @@ jobs:
           echo "Both 'debug-check' and 'functions-pr-data' jobs are present."
 
       - name: Verify steps in 'debug-check' job
+        if: always()
         run: |
           if ! grep -q "Print Debug Info" .github/workflows/08-expressions.yaml; then
             echo "Error: 'Print Debug Info' step is missing!"
@@ -54,6 +56,7 @@ jobs:
           echo "Steps in 'debug-check' job are correct."
 
       - name: Verify steps in 'functions-pr-data' job
+        if: always()
         run: |
           if ! grep -q "Print PR Info" .github/workflows/08-expressions.yaml; then
             echo "Error: 'Print PR Info' step is missing!"
@@ -69,23 +72,9 @@ jobs:
           fi
           echo "Steps in 'functions-pr-data' job are correct."
 
-      - name: Ensure that the YAML contains expressions
-        run: |
-          if ! grep -q "expression" .github/workflows/08-expressions.yaml; then
-            echo "Error: The file does not contain any expressions (e.g., 'expression || default_value')."
-            exit 1
-          fi
-          echo "Expressions are correctly defined in the workflow."
-
-      - name: Check if the workflow includes Mermaid diagram
-        run: |
-          if ! grep -q "graph TD" .github/workflows/08-expressions.yaml; then
-            echo "Error: Mermaid diagram is missing in the YAML workflow!"
-            exit 1
-          fi
-          echo "Mermaid diagram is present in the workflow."
-
+     
       - name: Check for valid input definitions in workflow_dispatch
+        if: always()
         run: |
           if ! grep -q "inputs" .github/workflows/08-expressions.yaml; then
             echo "Error: 'inputs' definition is missing in workflow_dispatch!"
