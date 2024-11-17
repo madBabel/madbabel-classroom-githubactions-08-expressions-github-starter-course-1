@@ -248,7 +248,7 @@ jobs:
       id: test2
       with:
           test-name: 'WorkFlow with fail is executed'   
-          command: 'echo ${{needs.any-manual-run-ko-check.outputs.stepsExecuted}}'
+          command: 'echo ${{needs.any-manual-run-ko-check.outputs.executed}}'
           input: ''
           expected-output: 'true'
           comparison-method: 'exact'  
@@ -258,7 +258,7 @@ jobs:
       id: test3
       with:
           test-name: 'WorkFlow with success is executed'   
-          command: 'echo ${{needs.any-manual-run-ok-check.outputs.stepsExecuted}}'
+          command: 'echo ${{needs.any-manual-run-ok-check.outputs.executed}}'
           input: ''
           expected-output: 'true'
           comparison-method: 'exact'  
@@ -268,7 +268,7 @@ jobs:
       id: test4
       with:
           test-name: 'WorkFlow with several branchs is executed'   
-          command: 'echo ${{needs.any-manual-run-with-branchs-check.stepsExecuted}}'
+          command: 'echo ${{needs.any-manual-run-with-branchs-check.outputs.executed}}'
           input: ''
           expected-output: 'true'
           comparison-method: 'exact'  
@@ -279,7 +279,7 @@ jobs:
       id: test5
       with:
           test-name: 'WorkFlow with PR fix  is executed'   
-          command: 'echo ${{needs.any-PR-run-check.stepsExecuted}}'
+          command: 'echo ${{needs.any-PR-run-check.outputs.executed}}'
           input: ''
           expected-output: 'true'
           comparison-method: 'exact'  
