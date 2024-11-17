@@ -1,65 +1,297 @@
 name: Autograding Tests
-'on':
-- push
-- repository_dispatch
+on:  
+  workflow_dispatch: 
+  repository_dispatch:
 permissions:
   checks: write
   actions: read
   contents: read
 jobs:
-  run-autograding-tests:
+  simply-wf-file-check:
+    if: github.actor != 'github-classroom[bot]'        
     runs-on: ubuntu-latest
-    if: github.actor != 'github-classroom[bot]'
     steps:
-    - name: Checkout code
-      uses: actions/checkout@v4
-    - name: test1
+      - uses: actions/checkout@v4
+
+      - name: Check if custom YAML file exists
+        run: |
+          if [[ ! -f .github/workflows/08-expressions.yaml ]]; then
+            echo "Error: Custom YAML (08-expressions.yaml) workflow file is missing!"
+            exit 1
+          fi
+          echo "Custom YAML file 08-expressions.yaml exists."
+
+      - name: Check for expected workflow triggers
+        if: always()
+        run: |
+          if ! grep -q "workflow_dispatch" .github/workflows/08-expressions.yaml; then
+            echo "Error: 'workflow_dispatch' trigger is missing!"
+            exit 1
+          fi
+          echo "'workflow_dispatch' trigger is defined."
+
+      - name: Verify jobs in the YAML file
+        run: |
+          if ! grep -q "debug-check" .github/workflows/08-expressions.yaml; then
+            echo "Error: 'debug-check' job is missing!"
+            exit 1
+          fi
+          if ! grep -q "functions-pr-data" .github/workflows/08-expressions.yaml; then
+            echo "Error: 'functions-pr-data' job is missing!"
+            exit 1
+          fi
+          echo "Both 'debug-check' and 'functions-pr-data' jobs are present."
+
+      - name: Verify steps in 'debug-check' job
+        if: always()
+        run: |
+          if ! grep -q "Print Debug Info" .github/workflows/08-expressions.yaml; then
+            echo "Error: 'Print Debug Info' step is missing!"
+            exit 1
+          fi
+          if ! grep -q "Triggered from Main" .github/workflows/08-expressions.yaml; then
+            echo "Error: 'Triggered from Main' step is missing!"
+            exit 1
+          fi
+          echo "Steps in 'debug-check' job are correct."
+
+      - name: Verify steps in 'functions-pr-data' job
+        if: always()
+        run: |
+          if ! grep -q "Print PR Info" .github/workflows/08-expressions.yaml; then
+            echo "Error: 'Print PR Info' step is missing!"
+            exit 1
+          fi
+          if ! grep -q "Bug Check" .github/workflows/08-expressions.yaml; then
+            echo "Error: 'Bug Check' step is missing!"
+            exit 1
+          fi
+          if ! grep -q "Sleep and Cancel" .github/workflows/08-expressions.yaml; then
+            echo "Error: 'Sleep and Cancel' step is missing!"
+            exit 1
+          fi
+          echo "Steps in 'functions-pr-data' job are correct."
+
+     
+      - name: Check for valid input definitions in workflow_dispatch
+        if: always()
+        run: |
+          if ! grep -q "inputs" .github/workflows/08-expressions.yaml; then
+            echo "Error: 'inputs' definition is missing in workflow_dispatch!"
+            exit 1
+          fi
+          echo "'inputs' section is defined in workflow_dispatch."
+
+    #  - name: Verify successful execution of workflow using GitHub API
+    #    uses: peter-evans/workflow-dispatch@v1
+    ##    with:
+    #      workflow: .github/workflows/08-expressions.yaml
+    #      token: ${{ secrets.GITHUB_TOKEN }}
+    #      ref: ${{ github.sha }}
+   #       inputs: |
+    #        debug: 'true'
+   #     id: workflow_run
+
+  any-manual-run-ok-check:
+    if: github.actor != 'github-classroom[bot]'    
+    outputs:
+      executed: ${{steps.getwf1.outputs.executed}}         
+    runs-on: ubuntu-latest
+    steps:              
+      - name: Get WF 
+        id: getwf1                       
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const workflow = '08-expressions.yaml' ;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const workflows = await github.rest.actions.listWorkflowRuns({
+                  owner,
+                  repo,
+                  workflow_id: workflow,
+                  per_page: 1,
+                  status: 'success',
+                  event: 'workflow_dispatch'                
+                });       
+
+            //console.log(workflows.data)  
+
+            const wfObj = workflows.data.workflow_runs.find(wf => 
+              wf.name === "08 Expressions"             
+            );       
+            core.setOutput('executed', wfObj != 'undefined');
+            console.log(wfObj != 'undefined')   
+          result-encoding: string
+  
+  any-manual-run-ko-check:
+    if: github.actor != 'github-classroom[bot]'    
+    outputs:
+      executed: ${{steps.get-wf.outputs.executed}}      
+    runs-on: ubuntu-latest
+    steps:              
+      - name: Get WF 
+        id: get-wf                
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const workflow = '08-expressions.yaml' ;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const workflows = await github.rest.actions.listWorkflowRuns({
+                  owner,
+                  repo,
+                  workflow_id: workflow,
+                  per_page: 1,
+                  status: 'failure',
+                  event: 'workflow_dispatch'                
+                });       
+
+            //console.log(workflows.data)  
+
+            const wfObj = workflows.data.workflow_runs.find(wf => 
+              wf.name === "08 Expressions"             
+            );       
+            core.setOutput('executed', wfObj != 'undefined');
+            console.log(wfObj != 'undefined')   
+          result-encoding: string
+
+  any-manual-run-with-branchs-check:
+    if: github.actor != 'github-classroom[bot]'        
+    outputs:
+      executed: ${{steps.get-wf.outputs.executed}}  
+    runs-on: ubuntu-latest
+    steps:              
+      - name: Get WF 
+        id: get-wf                
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const workflow = '08-expressions.yaml' ;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const workflows = await github.rest.actions.listWorkflowRuns({
+                  owner,
+                  repo,
+                  workflow_id: workflow,
+                  per_page: 100,            
+                  event: 'workflow_dispatch'                
+                });       
+
+            //console.log(workflows.data)  
+
+            const wfObjMain = workflows.data.workflow_runs.find(wf => 
+              wf.name === "08 Expressions" && 
+              wf.head_branch === "main"           
+            );   
+            const wfObjNotMain = workflows.data.workflow_runs.find(wf => 
+              wf.name === "08 Expressions"  &&
+              wf.head_branch != "main"           
+            );       
+            core.setOutput('executed', wfObjMain != 'undefined' && wfObjNotMain != 'undefined');  
+            console.log(wfObjMain != 'undefined' && wfObjNotMain != 'undefined')          
+          result-encoding: string
+
+      
+  any-PR-run-check:
+    if: github.actor != 'github-classroom[bot]'    
+    outputs:
+      executed: ${{steps.get-debug-wf.outputs.executed}}      
+    runs-on: ubuntu-latest
+    steps:  
+            
+      - name: Get WF 
+        id: get-debug-wf                
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const workflow = '08-expressions.yaml' ;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const workflows = await github.rest.actions.listWorkflowRuns({
+                  owner,
+                  repo,
+                  workflow_id: workflow,
+                  per_page: 100,
+                  status: 'success',
+                  event: 'pull_request'                
+                });       
+
+            // console.log(workflows.data)  
+
+            const wfObjMatch = workflows.data.workflow_runs.find(wf => 
+               wf.display_title.match('.*[fF][iI][xX].*')
+            );              
+            core.setOutput('executed', wfObjMatch != 'undefined');    
+            console.log(wfObjMatch != 'undefined')   
+          result-encoding: string
+
+
+  autograding-reporter:          
+    needs: [any-manual-run-ko-check,any-manual-run-ok-check,any-manual-run-with-branchs-check,any-PR-run-check,simply-wf-file-check]
+    runs-on: ubuntu-latest
+    if: ${{ github.actor != 'github-classroom[bot]'  && always() }}  
+    steps:       
+    - name: Simply Check WF
+      uses: classroom-resources/autograding-io-grader@v1      
       id: test1
-      uses: classroom-resources/autograding-command-grader@v1
       with:
-        test-name: test1
-        setup-command: sdf
-        command: sdfds
-        timeout: 10
-    - name: test2
+          test-name: 'WorkFlow file is created with requirements'   
+          command: 'echo ${{needs.simply-wf-file-check.result}}'
+          input: ''
+          expected-output: 'success'
+          comparison-method: 'exact'  
+          max-score: 20         
+
+    - name:  Any manual with fail is executed
+      uses: classroom-resources/autograding-io-grader@v1      
       id: test2
-      uses: classroom-resources/autograding-command-grader@v1
       with:
-        test-name: test2
-        setup-command: ''
-        command: asdad
-        timeout: 10
-    - name: test3
+          test-name: 'WorkFlow with fail is executed'   
+          command: 'echo ${{needs.any-manual-run-ko-check.outputs.executed}}'
+          input: ''
+          expected-output: 'true'
+          comparison-method: 'exact'  
+          max-score: 20     
+    - name:  Any manual with success is executed
+      uses: classroom-resources/autograding-io-grader@v1      
       id: test3
-      uses: classroom-resources/autograding-command-grader@v1
       with:
-        test-name: test3
-        setup-command: ''
-        command: asda
-        timeout: 10
-    - name: test4
+          test-name: 'WorkFlow with success is executed'   
+          command: 'echo ${{needs.any-manual-run-ok-check.outputs.executed}}'
+          input: ''
+          expected-output: 'true'
+          comparison-method: 'exact'  
+          max-score: 20     
+    - name:  Any manual with several branch is executed
+      uses: classroom-resources/autograding-io-grader@v1      
       id: test4
-      uses: classroom-resources/autograding-command-grader@v1
       with:
-        test-name: test4
-        setup-command: ''
-        command: adsa
-        timeout: 10
-    - name: test5
+          test-name: 'WorkFlow with several branchs is executed'   
+          command: 'echo ${{needs.any-manual-run-with-branchs-check.outputs.executed}}'
+          input: ''
+          expected-output: 'true'
+          comparison-method: 'exact'  
+          max-score: 20     
+
+    - name:  Any WF with PR fix is executed
+      uses: classroom-resources/autograding-io-grader@v1      
       id: test5
-      uses: classroom-resources/autograding-command-grader@v1
       with:
-        test-name: test5
-        setup-command: ''
-        command: asdad
-        timeout: 10
+          test-name: 'WorkFlow with PR fix  is executed'   
+          command: 'echo ${{needs.any-PR-run-check.outputs.executed}}'
+          input: ''
+          expected-output: 'true'
+          comparison-method: 'exact'  
+          max-score: 20    
+
     - name: Autograding Reporter
-      uses: classroom-resources/autograding-grading-reporter@v1
-      env:
-        TEST1_RESULTS: "${{steps.test1.outputs.result}}"
-        TEST2_RESULTS: "${{steps.test2.outputs.result}}"
-        TEST3_RESULTS: "${{steps.test3.outputs.result}}"
-        TEST4_RESULTS: "${{steps.test4.outputs.result}}"
-        TEST5_RESULTS: "${{steps.test5.outputs.result}}"
+      uses: classroom-resources/autograding-grading-reporter@v1     
       with:
-        runners: test1,test2,test3,test4,test5
+          runners: test1,test2,test3,test4, test5
+      env:
+        TEST1_RESULTS: "${{ steps.test1.outputs.result }}"      
+        TEST2_RESULTS: "${{ steps.test2.outputs.result }}"      
+        TEST3_RESULTS: "${{ steps.test3.outputs.result }}"     
+        TEST4_RESULTS: "${{ steps.test4.outputs.result }}"      
+        TEST5_RESULTS: "${{ steps.test5.outputs.result }}"              
