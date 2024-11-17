@@ -98,7 +98,7 @@ jobs:
     steps:  
             
       - name: Get WF 
-        id: get-debug-wf                
+        id: get-manual-wf                
         uses: actions/github-script@v6
         with:
           script: |
@@ -109,7 +109,7 @@ jobs:
                   owner,
                   repo,
                   workflow_id: workflow,
-                  per_page: 1,
+                  per_page: 100,
                   status: 'success',
                   event: 'workflow_dispatch'                
                 });       
@@ -122,6 +122,34 @@ jobs:
             //core.setOutput('executed', wfObj != 'undefined');
             //console.log(wfObj != 'undefined')   
           result-encoding: string
+      - name: Get WF 
+        if: always()
+        id: get-fail-manual-wf                
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const workflow = '08-expressions.yaml' ;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const workflows = await github.rest.actions.listWorkflowRuns({
+                  owner,
+                  repo,
+                  workflow_id: workflow,
+                  per_page: 100,
+                  status: 'failure',
+                  event: 'workflow_dispatch'                
+                });       
+
+            console.log(workflows.data)  
+
+            //const wfObj = workflows.data.workflow_runs.find(wf => 
+            //  wf.name === "07 - Contexts | DEBUG - true"             
+            //);       
+            //core.setOutput('executed', wfObj != 'undefined');
+            //console.log(wfObj != 'undefined')   
+          result-encoding: string
+
+      
   any-PR-run-check:
     if: github.actor != 'github-classroom[bot]'        
     runs-on: ubuntu-latest
@@ -139,16 +167,16 @@ jobs:
                   owner,
                   repo,
                   workflow_id: workflow,
-                  per_page: 1,
+                  per_page: 100,
                   status: 'success',
                   event: 'pull_request'                
                 });       
 
             console.log(workflows.data)  
 
-            //const wfObj = workflows.data.workflow_runs.find(wf => 
-              wf.name === "07 - Contexts | DEBUG - true"             
-            //);       
-            //core.setOutput('executed', wfObj != 'undefined');
-            //console.log(wfObj != 'undefined')   
+            const wfObj = workflows.data.workflow_runs.find(wf => 
+               wf.display_title.match('.*[fF][iI][xX].*') === "07 - Contexts | DEBUG - true"             
+            );       
+            core.setOutput('executed', wfObj != 'undefined');
+            console.log(wfObj != 'undefined')   
           result-encoding: string
