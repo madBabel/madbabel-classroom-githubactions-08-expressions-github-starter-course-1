@@ -7,7 +7,7 @@ permissions:
   actions: read
   contents: read
 jobs:
-  any-debug-wf:
+  simply-wf-file-check:
     if: github.actor != 'github-classroom[bot]'        
     runs-on: ubuntu-latest
     steps:
@@ -92,14 +92,17 @@ jobs:
     #        debug: 'true'
    #     id: workflow_run
 
-   
+  any-manual-run-check:
+    if: github.actor != 'github-classroom[bot]'        
+    runs-on: ubuntu-latest
+    steps:  
             
       - name: Get WF 
-        id: get-debug-wf        
+        id: get-debug-wf                
         uses: actions/github-script@v6
         with:
           script: |
-            const workflow = '07-contexts.yaml' ;
+            const workflow = '08-expressions.yaml' ;
             const owner = context.repo.owner;
             const repo = context.repo.repo;
             const workflows = await github.rest.actions.listWorkflowRuns({
@@ -107,12 +110,45 @@ jobs:
                   repo,
                   workflow_id: workflow,
                   per_page: 1,
-                  status: 'success'                
+                  status: 'success',
+                  event: 'workflow_dispatch'                
                 });       
 
-             const wfObj = workflows.data.workflow_runs.find(wf => 
+            console.log(workflows.data)  
+
+            //const wfObj = workflows.data.workflow_runs.find(wf => 
               wf.name === "07 - Contexts | DEBUG - true"             
-            );       
-            core.setOutput('executed', wfObj != 'undefined');
-            console.log(wfObj != 'undefined')   
+            //);       
+            //core.setOutput('executed', wfObj != 'undefined');
+            //console.log(wfObj != 'undefined')   
+          result-encoding: string
+  any-PR-run-check:
+    if: github.actor != 'github-classroom[bot]'        
+    runs-on: ubuntu-latest
+    steps:  
+            
+      - name: Get WF 
+        id: get-debug-wf                
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const workflow = '08-expressions.yaml' ;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const workflows = await github.rest.actions.listWorkflowRuns({
+                  owner,
+                  repo,
+                  workflow_id: workflow,
+                  per_page: 1,
+                  status: 'success',
+                  event: 'pull_request'                
+                });       
+
+            console.log(workflows.data)  
+
+            //const wfObj = workflows.data.workflow_runs.find(wf => 
+              wf.name === "07 - Contexts | DEBUG - true"             
+            //);       
+            //core.setOutput('executed', wfObj != 'undefined');
+            //console.log(wfObj != 'undefined')   
           result-encoding: string
