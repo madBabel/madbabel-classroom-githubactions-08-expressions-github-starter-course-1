@@ -175,11 +175,11 @@ jobs:
             console.log(workflows.data)  
 
             const wfObjMain = workflows.data.workflow_runs.find(wf => 
-              wf.name === "08 Expressions"  
+              wf.name === "08 Expressions" && 
               wf.head_branch === "main"           
             );   
             const wfObjNotMain = workflows.data.workflow_runs.find(wf => 
-              wf.name === "08 Expressions"  
+              wf.name === "08 Expressions"  &&
               wf.head_branch != "main"           
             );       
             core.setOutput('executed', wfObjMain != 'undefined' && wfObjNotMain != 'undefined');  
@@ -213,10 +213,7 @@ jobs:
 
             const wfObjMatch = workflows.data.workflow_runs.find(wf => 
                wf.display_title.match('.*[fF][iI][xX].*')
-            );       
-            const wfObjNotMatch = workflows.data.workflow_runs.find(wf => 
-              !wf.display_title.match('.*[fF][iI][xX].*')    
-            );       
-            core.setOutput('executed', wfObjMatch != 'undefined' && wfObjNotMatch != 'undefined');    
-            console.log(wfObjMatch != 'undefined' && wfObjNotMatch != 'undefined')   
+            );              
+            core.setOutput('executed', wfObjMatch != 'undefined');    
+            console.log(wfObjMatch != 'undefined')   
           result-encoding: string
