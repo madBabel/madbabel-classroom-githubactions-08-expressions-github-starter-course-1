@@ -82,7 +82,7 @@ jobs:
           echo "A previous step failed.
           
       - name: Print Always     
-        if: !cancelled()
+        if: ${{ !cancelled()}}
         run: |
           echo "This step runs unless the workflow is cancelled"
           
