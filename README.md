@@ -109,7 +109,7 @@ Consolidar conocimientos sobre expresiones, variables de entorno y funciones en 
        * Imprimir: `"Workflow cancelled."`
 3. **Confirmar y probar** el flujo de trabajo:
    
-   * Ejecutar el flujo desde la interfaz de usuario con diferentes valores de `debug` y `fail` Observando resultados.
+   * Ejecutar el flujo desde la interfaz de usuario con diferentes valores rama,  `debug` y `fail` Observando resultados.
    * Realizar pruebas con pull requests:
      1. Crear una nueva rama y modificar cualquier archivo, por ejemplo, `README.md`.
      2. Crear una **Pull Request** con un título que incluya la palabra `"fix"` (por ejemplo: `"Fix: typo in README"`).
