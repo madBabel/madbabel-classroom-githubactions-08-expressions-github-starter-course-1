@@ -70,9 +70,10 @@ jobs:
         run: |
           echo "sleep 20"
           
-      - name: Failing Step        
+      - name: Failing Step      
+        if: ${{inputs.fail}}
         run: |
-          return -1
+          exit -1
 
       - name: Conditional Step - Success
         if: success()       
