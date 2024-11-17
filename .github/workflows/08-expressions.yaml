@@ -8,6 +8,9 @@ on:
       debug:
         type: boolean
         default: false
+      fail:
+        type: boolean
+        default: false
 
 jobs:
   debug-check:
