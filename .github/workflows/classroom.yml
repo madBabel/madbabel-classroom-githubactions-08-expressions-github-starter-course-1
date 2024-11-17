@@ -92,11 +92,10 @@ jobs:
     #        debug: 'true'
    #     id: workflow_run
 
-  any-manual-run-check:
+  any-manual-run-ok-check:
     if: github.actor != 'github-classroom[bot]'        
     runs-on: ubuntu-latest
-    steps:  
-            
+    steps:              
       - name: Get WF 
         id: get-manual-wf                
         uses: actions/github-script@v6
@@ -109,22 +108,26 @@ jobs:
                   owner,
                   repo,
                   workflow_id: workflow,
-                  per_page: 100,
+                  per_page: 1,
                   status: 'success',
                   event: 'workflow_dispatch'                
                 });       
 
             console.log(workflows.data)  
 
-            //const wfObj = workflows.data.workflow_runs.find(wf => 
-              wf.name === "07 - Contexts | DEBUG - true"             
-            //);       
-            //core.setOutput('executed', wfObj != 'undefined');
-            //console.log(wfObj != 'undefined')   
+            const wfObj = workflows.data.workflow_runs.find(wf => 
+              wf.name === "08 Expressions"             
+            );       
+            core.setOutput('executed', wfObj != 'undefined');
+            console.log(wfObj != 'undefined')   
           result-encoding: string
+  
+  any-manual-run-ko-check:
+    if: github.actor != 'github-classroom[bot]'        
+    runs-on: ubuntu-latest
+    steps:              
       - name: Get WF 
-        if: always()
-        id: get-fail-manual-wf                
+        id: get-manual-wf                
         uses: actions/github-script@v6
         with:
           script: |
@@ -135,18 +138,52 @@ jobs:
                   owner,
                   repo,
                   workflow_id: workflow,
-                  per_page: 100,
+                  per_page: 1,
                   status: 'failure',
                   event: 'workflow_dispatch'                
                 });       
 
             console.log(workflows.data)  
 
-            //const wfObj = workflows.data.workflow_runs.find(wf => 
-            //  wf.name === "07 - Contexts | DEBUG - true"             
-            //);       
-            //core.setOutput('executed', wfObj != 'undefined');
-            //console.log(wfObj != 'undefined')   
+            const wfObj = workflows.data.workflow_runs.find(wf => 
+              wf.name === "08 Expressions"             
+            );       
+            core.setOutput('executed', wfObj != 'undefined');
+            console.log(wfObj != 'undefined')   
+          result-encoding: string
+
+  any-manual-run-with-branchs-check:
+    if: github.actor != 'github-classroom[bot]'        
+    runs-on: ubuntu-latest
+    steps:              
+      - name: Get WF 
+        id: get-manual-wf                
+        uses: actions/github-script@v6
+        with:
+          script: |
+            const workflow = '08-expressions.yaml' ;
+            const owner = context.repo.owner;
+            const repo = context.repo.repo;
+            const workflows = await github.rest.actions.listWorkflowRuns({
+                  owner,
+                  repo,
+                  workflow_id: workflow,
+                  per_page: 100,            
+                  event: 'workflow_dispatch'                
+                });       
+
+            console.log(workflows.data)  
+
+            const wfObjMain = workflows.data.workflow_runs.find(wf => 
+              wf.name === "08 Expressions"  
+              wf.head_branch === "main"           
+            );   
+            const wfObjNotMain = workflows.data.workflow_runs.find(wf => 
+              wf.name === "08 Expressions"  
+              wf.head_branch != "main"           
+            );       
+            core.setOutput('executed', wfObjMain != 'undefined' && wfObjNotMain != 'undefined');  
+            console.log(wfObjMain != 'undefined' && wfObjNotMain != 'undefined')          
           result-encoding: string
 
       
@@ -174,9 +211,12 @@ jobs:
 
             console.log(workflows.data)  
 
-            const wfObj = workflows.data.workflow_runs.find(wf => 
+            const wfObjMatch = workflows.data.workflow_runs.find(wf => 
                wf.display_title.match('.*[fF][iI][xX].*')
             );       
-            core.setOutput('executed', wfObj != 'undefined');
-            console.log(wfObj != 'undefined')   
+            const wfObjNotMatch = workflows.data.workflow_runs.find(wf => 
+              !wf.display_title.match('.*[fF][iI][xX].*')    
+            );       
+            core.setOutput('executed', wfObjMatch != 'undefined' && wfObjNotMatch != 'undefined');    
+            console.log(wfObjMatch != 'undefined' && wfObjNotMatch != 'undefined')   
           result-encoding: string
