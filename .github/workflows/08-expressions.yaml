@@ -3,6 +3,7 @@ env:
   WORKFLOW_VAR: This is a workflow-level variable
   OVERWRITTEN: Default workflow value
 on:
+  pull_request:   
   workflow_dispatch:
     inputs:
       debug:

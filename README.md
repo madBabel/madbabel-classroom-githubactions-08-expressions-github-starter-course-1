@@ -11,9 +11,11 @@ Consolidar conocimientos sobre expresiones, variables de entorno y funciones en 
 1. **Crear un archivo de flujo de trabajo** llamado `08-expressions.yaml` en la carpeta `.github/workflows` en la raíz del repositorio. El flujo debe cumplir con las siguientes características:
    
    * **Nombre:** 08 Expressions
-   * **Desencadenantes:** Solo `workflow_dispatch`. 
-    - Agregar un parámetro de entrada llamado `debug` de tipo booleano con un valor predeterminado `false`.
-    - Agregar un parámetro de entrada llamado `fail` de tipo booleano con un valor predeterminado `false`.
+   * **Desencadenantes:** 
+    - `pull request`
+    - `workflow_dispatch`. 
+      - Agregar un parámetro de entrada llamado `debug` de tipo booleano con un valor predeterminado `false`.
+      - Agregar un parámetro de entrada llamado `fail` de tipo booleano con un valor predeterminado `false`.
    * **Variables de entorno a nivel de workflow:**
      * `WORKFLOW_VAR`: `'This is a workflow-level variable'`.
      * `OVERWRITTEN`: `'Default workflow value'`.
