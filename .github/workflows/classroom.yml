@@ -175,7 +175,7 @@ jobs:
             console.log(workflows.data)  
 
             const wfObj = workflows.data.workflow_runs.find(wf => 
-               wf.display_title.match('.*[fF][iI][xX].*') === "07 - Contexts | DEBUG - true"             
+               wf.display_title.match('.*[fF][iI][xX].*')
             );       
             core.setOutput('executed', wfObj != 'undefined');
             console.log(wfObj != 'undefined')   
