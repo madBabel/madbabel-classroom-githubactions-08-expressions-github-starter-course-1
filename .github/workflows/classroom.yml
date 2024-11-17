@@ -93,7 +93,9 @@ jobs:
    #     id: workflow_run
 
   any-manual-run-ok-check:
-    if: github.actor != 'github-classroom[bot]'        
+    if: github.actor != 'github-classroom[bot]'    
+    outputs:
+      executed: ${{steps.get-manual-wf.executed}}         
     runs-on: ubuntu-latest
     steps:              
       - name: Get WF 
@@ -113,7 +115,7 @@ jobs:
                   event: 'workflow_dispatch'                
                 });       
 
-            console.log(workflows.data)  
+            //console.log(workflows.data)  
 
             const wfObj = workflows.data.workflow_runs.find(wf => 
               wf.name === "08 Expressions"             
@@ -123,11 +125,13 @@ jobs:
           result-encoding: string
   
   any-manual-run-ko-check:
-    if: github.actor != 'github-classroom[bot]'        
+    if: github.actor != 'github-classroom[bot]'    
+    outputs:
+      executed: ${{steps.get-wf.executed}}      
     runs-on: ubuntu-latest
     steps:              
       - name: Get WF 
-        id: get-manual-wf                
+        id: get-wf                
         uses: actions/github-script@v6
         with:
           script: |
@@ -143,7 +147,7 @@ jobs:
                   event: 'workflow_dispatch'                
                 });       
 
-            console.log(workflows.data)  
+            //console.log(workflows.data)  
 
             const wfObj = workflows.data.workflow_runs.find(wf => 
               wf.name === "08 Expressions"             
@@ -154,10 +158,12 @@ jobs:
 
   any-manual-run-with-branchs-check:
     if: github.actor != 'github-classroom[bot]'        
+    outputs:
+      executed: ${{steps.get-wf.executed}}  
     runs-on: ubuntu-latest
     steps:              
       - name: Get WF 
-        id: get-manual-wf                
+        id: get-wf                
         uses: actions/github-script@v6
         with:
           script: |
@@ -172,7 +178,7 @@ jobs:
                   event: 'workflow_dispatch'                
                 });       
 
-            console.log(workflows.data)  
+            //console.log(workflows.data)  
 
             const wfObjMain = workflows.data.workflow_runs.find(wf => 
               wf.name === "08 Expressions" && 
@@ -188,7 +194,9 @@ jobs:
 
       
   any-PR-run-check:
-    if: github.actor != 'github-classroom[bot]'        
+    if: github.actor != 'github-classroom[bot]'    
+    outputs:
+      executed: ${{steps.get-debug-wf.executed}}      
     runs-on: ubuntu-latest
     steps:  
             
@@ -209,7 +217,7 @@ jobs:
                   event: 'pull_request'                
                 });       
 
-            console.log(workflows.data)  
+            // console.log(workflows.data)  
 
             const wfObjMatch = workflows.data.workflow_runs.find(wf => 
                wf.display_title.match('.*[fF][iI][xX].*')
@@ -217,3 +225,73 @@ jobs:
             core.setOutput('executed', wfObjMatch != 'undefined');    
             console.log(wfObjMatch != 'undefined')   
           result-encoding: string
+
+
+  autograding-reporter:          
+    needs: [any-manual-run-ko-check,any-manual-run-ok-check,any-manual-run-with-branchs-check,any-PR-run-check,simply-wf-file-check]
+    runs-on: ubuntu-latest
+    if: ${{ github.actor != 'github-classroom[bot]'  && always() }}  
+    steps:       
+    - name: Simply Check WF
+      uses: classroom-resources/autograding-io-grader@v1      
+      id: test1
+      with:
+          test-name: 'WorkFlow file is created with requirements'   
+          command: 'echo ${{needs.simply-wf-file-check.result}}'
+          input: ''
+          expected-output: 'success'
+          comparison-method: 'exact'  
+          max-score: 20         
+
+    - name:  Any manual with fail is executed
+      uses: classroom-resources/autograding-io-grader@v1      
+      id: test2
+      with:
+          test-name: 'WorkFlow with fail is executed'   
+          command: 'echo ${{needs.any-manual-run-ko-check.outputs.stepsExecuted1}}'
+          input: ''
+          expected-output: 'true'
+          comparison-method: 'exact'  
+          max-score: 20     
+    - name:  Any manual with success is executed
+      uses: classroom-resources/autograding-io-grader@v1      
+      id: test3
+      with:
+          test-name: 'WorkFlow with success is executed'   
+          command: 'echo ${{needs.any-manual-run-ok-check.outputs.stepsExecuted2}}'
+          input: ''
+          expected-output: 'true'
+          comparison-method: 'exact'  
+          max-score: 20     
+    - name:  Any manual with several branch is executed
+      uses: classroom-resources/autograding-io-grader@v1      
+      id: test4
+      with:
+          test-name: 'WorkFlow with several branchs is executed'   
+          command: 'echo ${{needs.any-manual-run-with-branchs-check.stepsExecuted1}}'
+          input: ''
+          expected-output: 'true'
+          comparison-method: 'exact'  
+          max-score: 20     
+
+    - name:  Any WF with PR fix is executed
+      uses: classroom-resources/autograding-io-grader@v1      
+      id: test5
+      with:
+          test-name: 'WorkFlow with PR fix  is executed'   
+          command: 'echo ${{needs.any-PR-run-check.stepsExecuted2}}'
+          input: ''
+          expected-output: 'true'
+          comparison-method: 'exact'  
+          max-score: 20    
+
+    - name: Autograding Reporter
+      uses: classroom-resources/autograding-grading-reporter@v1     
+      with:
+          runners: test1,test2,test3,test4, test5
+      env:
+        TEST1_RESULTS: "${{ steps.test1.outputs.result }}"      
+        TEST2_RESULTS: "${{ steps.test2.outputs.result }}"      
+        TEST3_RESULTS: "${{ steps.test3.outputs.result }}"     
+        TEST4_RESULTS: "${{ steps.test4.outputs.result }}"      
+        TEST5_RESULTS: "${{ steps.test5.outputs.result }}"              
