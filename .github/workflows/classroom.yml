@@ -95,11 +95,11 @@ jobs:
   any-manual-run-ok-check:
     if: github.actor != 'github-classroom[bot]'    
     outputs:
-      executed: ${{steps.get-manual-wf.executed}}         
+      executed: ${{steps.getwf1.outputs.executed}}         
     runs-on: ubuntu-latest
     steps:              
       - name: Get WF 
-        id: get-manual-wf                
+        id: getwf1                       
         uses: actions/github-script@v6
         with:
           script: |
@@ -127,7 +127,7 @@ jobs:
   any-manual-run-ko-check:
     if: github.actor != 'github-classroom[bot]'    
     outputs:
-      executed: ${{steps.get-wf.executed}}      
+      executed: ${{steps.get-wf.outputs.executed}}      
     runs-on: ubuntu-latest
     steps:              
       - name: Get WF 
@@ -159,7 +159,7 @@ jobs:
   any-manual-run-with-branchs-check:
     if: github.actor != 'github-classroom[bot]'        
     outputs:
-      executed: ${{steps.get-wf.executed}}  
+      executed: ${{steps.get-wf.outputs.executed}}  
     runs-on: ubuntu-latest
     steps:              
       - name: Get WF 
@@ -196,7 +196,7 @@ jobs:
   any-PR-run-check:
     if: github.actor != 'github-classroom[bot]'    
     outputs:
-      executed: ${{steps.get-debug-wf.executed}}      
+      executed: ${{steps.get-debug-wf.outputs.executed}}      
     runs-on: ubuntu-latest
     steps:  
             
