@@ -55,8 +55,8 @@ jobs:
 
       - name: Verify steps in 'functions-pr-data' job
         run: |
-          if ! grep -q "Print PR data" .github/workflows/08-expressions.yaml; then
-            echo "Error: 'Print PR data' step is missing!"
+          if ! grep -q "Print PR Info" .github/workflows/08-expressions.yaml; then
+            echo "Error: 'Print PR Info' step is missing!"
             exit 1
           fi
           if ! grep -q "Bug Check" .github/workflows/08-expressions.yaml; then
