@@ -63,7 +63,7 @@ jobs:
       - name: Bug Check
         if: ${{ !cancelled() && contains(github.event.pull_request.title,'fix') }}
         run: |
-          echo " This PR fixes a bug.
+          echo "This PR fixes a bug."
 
       - name: Sleep and Cancel 
         shell: bash
