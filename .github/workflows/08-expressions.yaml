@@ -15,6 +15,9 @@ env:
 jobs:
   debug-check:
     runs-on: ubuntu-latest
+    env:
+      JOB_VAR: This is a job-level variable
+      OVERWRITTEN: Overwritten at job level
     steps:
       - name: \[Debug\] Print Debug Info
         if: ${{inputs.debug}}
