@@ -3,9 +3,7 @@
 ## Objetivo
 
 Consolidar conocimientos sobre expresiones, variables de entorno y funciones en GitHub Actions mediante la implementación de un flujo de trabajo práctico y multifuncional.
-
 ---
-
 ## Tareas
 
 1. **Crear un archivo de flujo de trabajo** llamado `08-expressions.yaml` en la carpeta `.github/workflows` en la raíz del repositorio. El flujo debe cumplir con las siguientes características:
