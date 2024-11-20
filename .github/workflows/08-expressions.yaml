@@ -61,7 +61,7 @@ jobs:
           echo "PR Title: ${{ github.event.pull_request.title }}"
           echo "PR Labels:"
           cat << EOF
-          ${{ toJSON(github.event.pull_request.labels) }}
+          ${{ toJSON(github.event.pull_request.labels)}}
           EOF
 
       - name: "Bug Check"
