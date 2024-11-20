@@ -75,7 +75,7 @@ jobs:
           sleep 20
 
       - name: "Failing Step"
-        if: inputs.fail == 'true'
+        if: ${{inputs.fail}}
         run: |
           echo "Failing step as per input parameter."
           exit -1
