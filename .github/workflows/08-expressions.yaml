@@ -1,8 +1,5 @@
 # Archivo: .github/workflows/08-expressions.yaml
 name: "08 Expressions"
-
-run-name: "Expression Workflow Run - ${{ runner.os }}"
-
 on:
   pull_request:
   workflow_dispatch:
@@ -17,7 +14,6 @@ on:
         required: false
         type: boolean
         default: false
-
 env:
   WORKFLOW_VAR: "This is a workflow-level variable"
   OVERWRITTEN: "Default workflow value"
