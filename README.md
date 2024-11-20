@@ -209,7 +209,7 @@ graph TD
     G --is pull_request --> H[S: Print PR data]
     G -- PR title contains 'fix' --> J[S: Bug Check]
     G --> K[S: Sleep and Cancel]
-    G --> L[S: Failing Step]
+    G -- if inputs.fail  --> L[S: Failing Step]
     G -- if success--> M[S: Conditional Step - Success]
     G -- if: failure --> N[S: Conditional Step - Failure]
     G -- if: not cancelled --> O[S Print Always]
