@@ -8,10 +8,10 @@ on:
     inputs:
       debug:
         type: boolean
-        default: false
+        default: true
       fail:
         type: boolean
-        default: false
+        default: true
 
 jobs:
   debug-check:
