@@ -66,8 +66,9 @@ jobs:
           echo " This PR fixes a bug.
 
       - name: Sleep and Cancel 
+        shell: bash
         run: |
-          echo "sleep 20"
+          sleep 20
 
       - name: Failing Step  
         if: ${{ inputs.fail }}
