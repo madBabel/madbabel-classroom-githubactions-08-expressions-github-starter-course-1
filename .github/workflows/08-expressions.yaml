@@ -78,7 +78,7 @@ jobs:
         if: inputs.fail == 'true'
         run: |
           echo "Failing step as per input parameter."
-          exit 1
+          exit -1
 
       - name: "Conditional Step - Success"
         if: success()
